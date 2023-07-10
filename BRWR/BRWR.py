@@ -9,19 +9,19 @@ from Protein import get
 """
 
 def get_matrix_total(data_file):
-    # 读取表格
+
     data = pd.read_excel(data_file)  # 24743 rows  X 2 columns
 
-    # start为表格的第一列
-    start = []  # 空列表
 
-    for i in data['start']:  # 此处的data['start'] 是一个名字为start，长度为24743的对象，对象存储的内容为第一列的所有元素。
+    start = [] 
+
+    for i in data['start']: 
         if i not in start:
-            start.append(i)  # 在列表尾添加对象
+            start.append(i) 
 
     print("the number of start is", len(start))
 
-    # end为表格的第二列
+
     end = []
     for i in data['end']:
         if i not in end:
@@ -29,26 +29,24 @@ def get_matrix_total(data_file):
 
     print("the number of end is", len(end))
 
-    # total_n为去重后的蛋白质字符串列表
     total_n = []
-    # total为原始的蛋白质列表
     total = start + end
 
-    # 列表去重 for循环去重
+
     for i in total:
         if i not in total_n:
             total_n.append(i)
-    # n为total_n的长度
 
-    print("the number of list uniq total is", len(total_n))  # 打印去重后的列表长度
 
-    # 将读取的表格转化为稀疏矩阵
+    print("the number of list uniq total is", len(total_n)) 
+
+
     matrix = ss.lil_matrix((len(total_n), len(total_n)))
 
     for i in range(len(data['start'])):
         index_start = total_n.index(data['start'][i])
         index_end = total_n.index(data['end'][i])
-        matrix[index_start, index_end] = 1  # 给矩阵赋值
+        matrix[index_start, index_end] = 1 
         matrix[index_end, index_start] = 1
     return matrix, total_n
 
@@ -123,7 +121,6 @@ def get_Gene12_T(matrix_A, total_n):
                 Y_index = protein_id.index(y)
                 C = list(set(Active_list[X_index]) & set(Active_list[Y_index]))
                 RN = len(C)
-                # 属于同一基因周期
                 if RN > 0:
                     R_N[i, j] = 1
                     R_N[j, i] = 1
@@ -140,7 +137,7 @@ def get_SUBcell_T(matrix_A, total_n):
                  'nucleus',
                  'peroxisome', 'plasma', 'vacuole']
     ix_dict = dict()
-    # enumerate:将location列表组合成一个索引序列
+
     for i, loc in enumerate(locations):
         ix_dict[loc] = i
 
@@ -298,7 +295,6 @@ def get_SCS(total_n):
                  'nucleus',
                  'peroxisome', 'plasma', 'vacuole']
     ix_dict = dict()
-    # enumerate:将location列表组合成一个索引序列
     for i, loc in enumerate(locations):
         ix_dict[loc] = i
     # print("ix", ix_dict[loc])
@@ -486,7 +482,7 @@ def Probability_matrix(matrix_A, total_n):
                 R_AN[i, j] = matrix_A[i, j]
                 R_AN[j, i] = matrix_A[j, i]
         R_AN[i, i] = 1
-    # print('相似邻居矩阵', R_AN)
+
 
 
 
@@ -500,7 +496,7 @@ def Probability_matrix(matrix_A, total_n):
 
 
 
-    # print('相似度矩阵', R_D)
+
     # 转移概率矩阵
     P = np.dot(R_AN, R_D).todense()
 
